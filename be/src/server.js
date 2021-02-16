@@ -14,6 +14,7 @@ const {
 } = require("./errorHandlers");
 
 //*IMPORT ROUTES
+const usersRouter = require("./services/users");
 
 //*SERVER
 const server = express();
@@ -24,6 +25,7 @@ server.use(express.json());
 // sever.use(cors());
 
 //*ROUTES
+server.use("/user", usersRouter);
 
 //*ERROR HANDLERS
 server.use(badRequestHandler);
