@@ -16,7 +16,7 @@ usersRouter.post("/register", async (req, res, next) => {
   }
 });
 
-usersRouter.get("/", async (req, res, next) => {
+usersRouter.get("/", basic, adminOnly, async (req, res, next) => {
   try {
     const users = await UserModel.find();
     res.send(users);
@@ -25,19 +25,36 @@ usersRouter.get("/", async (req, res, next) => {
   }
 });
 
-// usersRouter.put("/me", basic, async (req, res, next) => {
-//   try {
-//     res.send(req.user);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
+usersRouter.get("/me", basic, async (req, res, next) => {
+  try {
+    res.send(req.user);
+  } catch (error) {
+    next(err);
+  }
+});
 
-// usersRouter.delete("/me", async (req, res, next) => {
-//   try {
-//   } catch (error) {
-//     next(error);
-//   }
-// });
+usersRouter.put("/me", basic, async (req, res, next) => {
+  try {
+    const updates = Object.keys(req.body);
+    console.log("Updates ", updates);
+
+    updates.forEach(update => (req.user[update] = req.body[update]));
+    await req.user.save();
+    res.send(req.user);
+
+    res.send(updates);
+  } catch (error) {
+    next(error);
+  }
+});
+
+usersRouter.delete("/me", basic, async (req, res, next) => {
+  try {
+    await req.user.deleteOne();
+    res.status(204).send("Deleted");
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = usersRouter;

@@ -7,11 +7,15 @@ const basicAuthMiddleware = async (req, res, next) => {
     error.httpStatusCode = 401;
     next(error);
   } else {
-    const [email, password] = atob(
-      req.headers.authorization.split(" ")[1]
-    ).split(":");
+    const [method, token] = req.headers.authorization.split(" ");
 
-    const user = await UserModel.findByCredentials(email, password);
+    const decoded = atob(token);
+    console.log(decoded);
+    const [username, password] = decoded.split(":");
+    // const [username, password] = atob(
+    //     req.headers.authorization.split(" ")[1]
+    //   ).split(":");
+    const user = await UserModel.findByCredentials(username, password);
     if (!user) {
       const error = new Error("Wrong credentials provided");
       error.httpStatusCode = 401;
@@ -24,7 +28,15 @@ const basicAuthMiddleware = async (req, res, next) => {
   }
 };
 
-const adminOnlyMiddleware = async (req, res, next) => {};
+const adminOnlyMiddleware = async (req, res, next) => {
+  if (req.user && req.user.role === "admin") {
+    next();
+  } else {
+    const err = new Error("Admins Only!");
+    err.httpStatusCode = 403;
+    next(err);
+  }
+};
 
 module.exports = {
   basic: basicAuthMiddleware,

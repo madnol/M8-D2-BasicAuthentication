@@ -29,7 +29,7 @@ const UserSchema = new Schema(
   { timestamps: true }
 );
 
-UserSchema.statics.findByCredentials = async function (email, password) {
+UserSchema.statics.findByCredentials = async function (username, password) {
   const user = await this.findOne({ username });
 
   if (user) {
